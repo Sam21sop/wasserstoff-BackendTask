@@ -1,0 +1,32 @@
+{
+  "name": "wasserstoff-backendtask",
+  "version": "1.0.0",
+  "description": "<h1 align=\"center\">Intelligent Load Balancer for Multi-API Management</h1>",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"node server.js\" \"node src/server_01.js\" \"node src/server_02.js\" \"node src/server_03.js\"",
+    "server": "concurrently \"nodemon server.js\" \"nodemon src/server_01.js\" \"nodemon src/server_02.js\" \"nodemon src/server_03.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sam21sop/wasserstoff-BackendTask.git"
+  },
+  "author": "sopan bhere",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Sam21sop/wasserstoff-BackendTask/issues"
+  },
+  "homepage": "https://github.com/Sam21sop/wasserstoff-BackendTask#readme",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "express": "^4.19.2",
+    "morgan": "^1.10.0",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.4"
+  }
+}
