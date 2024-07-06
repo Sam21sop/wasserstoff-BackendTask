@@ -4,62 +4,68 @@ This project implements a load balancer that intelligently routes incoming reque
 
 
 ## System Architecture Diagram
+![System Flow](./public/loadbalancer.png)
 
-                     +-------------------------------------------+
-                     |                 Clients                  |
-                     +-------------------------------------------+
-                                     |
-                                     | HTTP Requests
-                                     v
-                     +-------------------------------------------+
-                     |              Load Balancer                |
-                     |                                           |
-                     |   +-------------------+  +-------------+  |
-                     |   |   Queue Manager   |  |   Logger     |  |
-                     |   +-------------------+  +-------------+  |
-                     |       |         |           |             |
-         +----------------+  |         |           |             +---------------+
-         |   FIFO Queue   |  |   Priority Queue  | |             | Combined Logs  |
-         +----------------+  |         |           |             +---------------+
-         |         |         |         |           |             +---------------+
-         v         v         v         v           |             |   Error Logs   |
-         +----------------+  +----------------+    |             +---------------+
-         | Request Handler |  | Request Handler |  |
-         +----------------+  +----------------+    |
-                     |                  |          |
-                     v                  v          v
-             +--------------+  +--------------+ +-----------------+
-             | Healthy API  |  | Healthy API  | |  Metrics Logger |
-             |  Selector    |  |  Selector    | +-----------------+
-             +--------------+  +--------------+
-                     |                 |
-                     v                 v
-          +-------------+  +-------------+  +-------------+
-          | Mock API 1  |  | Mock API 2  |  | Mock API 3  |
-          |  (REST)     |  | (GraphQL)   |  |   (gRPC)    |
-          +-------------+  +-------------+  +-------------+
-            |       |         |       |        |       |
-          +-----+ +-----+   +-----+ +-----+  +-----+ +-----+
-          |Fast | |Slow |   |Fast | |Slow |  |Fast | |Slow |
-          +-----+ +-----+   +-----+ +-----+  +-----+ +-----+
+
+                          +-------------------------------------------+
+                          |                 Clients                   |
+                          +-------------------------------------------+
+                              |       |       |     |     |       |       
+                              |       |       |     |     |       |        <--- HTTP Requests
+                              v       v       v     v     v       v       
+                    +-----------------------------------------------------------+
+                    |                   Load Balancer                           | 
+                    |                                                           | 
+                    |           +--------------------------------+              | 
+                    |           |           Queue Manager        |              |
+                    |           +--------------------------------+              | 
+                    |               |                     |                     |                     
+                    |               |                     |                     |     
+                    |               |                     |                     |     
+                    |               v                     v                     |         
+                    |        +----------------+     +----------------+          |                                         
+                    |        |   FIFO Queue   |     | Priority Queue |          |                                 
+                    |        +----------------+     +----------------+          |                                                   
+                    |             |                          |                  |                                         
+                    |             v                          v                  |                                           
+                    |        +------------------+    +------------------+       |                                   
+                    |        | Request Handler  |    | Request Handler  |       |                     
+                    |        +------------------+    +------------------+       |                     
+                    |                |                         |                |                     
+                    |                v                         v                |                     
+                    |        +--------------+          +--------------+         |                   
+                    |        | Healthy API  |          | Healthy API  |         |                   
+                    |        |  Selector    |          |  Selector    |         |                   
+                    |        +--------------+          +--------------+         |                 
+                    |              |                         |                  |         
+                    |              v                         v                  |         
+                    |      +-------------+  +-------------+  +-------------+    |                      
+                    |      | Mock API 1  |  | Mock API 2  |  | Mock API 3  |    |                      
+                    |      |  (REST)     |  | (GraphQL)   |  |   (gRPC)    |    |                      
+                    |      +-------------+  +-------------+  +-------------+    |                      
+                    |        |       |         |       |        |       |       |                   
+                    |      +-----+ +-----+   +-----+ +-----+  +-----+ +-----+   |                     
+                    |      |Fast | |Slow |   |Fast | |Slow |  |Fast | |Slow |   |                     
+                    |      +-----+ +-----+   +-----+ +-----+  +-----+ +-----+   |                     
+                    +-----------------------------------------------------------+
 
 
 
 ### Component Descriptions
-1. ***Clients***: The users or services that send HTTP requests to the load balancer.
-2. ***Load Balancer***: The main component that routes incoming requests to the appropriate mock APIs based on defined criteria and queuing strategies.
-  - Queue Manager: Manages different queue strategies (FIFO, priority-based, round-robin) and enqueues incoming requests.
-  - Logger: Captures and logs metrics such as request times, endpoint selection, and response times.
-3. ***Queues***:
-  - FIFO Queue: First-In-First-Out queue strategy.
-  - Priority Queue: Handles requests based on priority.
-  - Round-Robin Queue: Distributes requests in a round-robin manner.
+1. ***Clients*** The users or services that send HTTP requests to the load balancer.
+2. ***Load Balancer*** The main component that routes incoming requests to the appropriate mock APIs based on defined criteria and queuing strategies.
+    - Queue Manager: Manages different queue strategies (FIFO, priority-based, round-robin) and enqueues incoming requests.
+    - Logger: Captures and logs metrics such as request times, endpoint selection, and response times.
+3. ***Queues***
+    - FIFO Queue: First-In-First-Out queue strategy.
+    - Priority Queue: Handles requests based on priority.
+    - Round-Robin Queue: Distributes requests in a round-robin manner.
 4. ***Request Handler***: Processes requests from queues and selects a healthy API endpoint using the Healthy API Selector.
 5. ***Healthy API Selector***: Determines the healthiest API endpoint based on a weighted random selection algorithm, which considers the health status and weights of APIs.
 6. ***Mock APIs***: Simulate different types of APIs (REST, GraphQL, gRPC) with varied response times and behaviors.
-  - Mock API 1: A REST API with endpoints that simulate fast and slow responses.
-  - Mock API 2: A GraphQL API with endpoints that simulate fast and slow responses.
-  - Mock API 3: A gRPC API with endpoints that simulate fast and slow responses.
+    - Mock API 1: A REST API with endpoints that simulate fast and slow responses.
+    - Mock API 2: A GraphQL API with endpoints that simulate fast and slow responses.
+    - Mock API 3: A gRPC API with endpoints that simulate fast and slow responses.
 7. ***Metrics Logger***: Logs metrics for analysis to understand the performance and load distribution of the queuing strategies.
 
 
