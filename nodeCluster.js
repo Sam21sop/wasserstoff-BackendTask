@@ -1,5 +1,5 @@
 import cluster from 'cluster';
-import { availableParallelism } from 'os';
+import { cpus } from 'os';
 import process from 'process';
 import express from 'express';
 
@@ -11,8 +11,7 @@ import express from 'express';
  * The cluster module allows easy creation of child processes that all share server ports.
  */
 
-
-const numCPUs = availableParallelism();
+const numCPUs = cpus().length;
 
 if (cluster.isPrimary) {
   console.log(`Primary ${process.pid} is running`);
@@ -21,16 +20,12 @@ if (cluster.isPrimary) {
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
   }
-
-  cluster.on('exit', (worker, code, signal) => {
-    console.log(`Worker ${worker.process.pid} died`);
-  });
 } else {
   // Workers can share any TCP connection In this case, it is an HTTP server with Express
   const app = express();
 
   app.get('/', (req, res) => {
-    res.send('hello world\n');
+    res.send(`hello Developer, Worker ${process.pid} executed`);
   });
 
   app.listen(8000, () => {
