@@ -6,6 +6,8 @@ This project implements a load balancer that intelligently routes incoming reque
 ## System Architecture Diagram
 ![System Flow](./public/loadbalancer.png)
 
+![Round Robin](./public/RoundRobinLoadBalancer.png)
+
 
                           +-------------------------------------------+
                           |                 Clients                   |
