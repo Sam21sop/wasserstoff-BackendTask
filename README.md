@@ -2,6 +2,12 @@
 
 This project implements a load balancer that intelligently routes incoming requests to multiple unique API endpoints based on dynamic routing criteria. It showcases the understanding of load balancing concepts and the ability to design and implement a sophisticated routing mechanism.
 
+Clusters of Node.js processes can be used to run multiple instances of Node.js 
+that can distribute workloads among their application threads.
+
+The cluster module allows easy creation of child processes that all share server ports.
+
+
 
 ## System Architecture Diagram
 ![System Flow](./public/loadbalancer.png)
@@ -71,7 +77,7 @@ This project implements a load balancer that intelligently routes incoming reque
 7. ***Metrics Logger***: Logs metrics for analysis to understand the performance and load distribution of the queuing strategies.
 
 
-### Interaction Steps
+### Steps
 1. Clients send HTTP requests to the load balancer.
 2. The load balancer's Queue Manager enqueues requests into the appropriate queue based on the specified strategy.
 3. The Request Handler dequeues requests and uses the Healthy API Selector to determine a healthy API endpoint.
